@@ -1,0 +1,21 @@
+CREATE DATABASE ExamSystem;
+
+USE ExamSystem;
+
+CREATE TABLE questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_type VARCHAR(20),
+    subject VARCHAR(20),
+    question TEXT,
+    option_a TEXT,
+    option_b TEXT,
+    option_c TEXT,
+    option_d TEXT,
+    correct_option CHAR(1)
+);
+
+INSERT INTO questions (exam_type, subject, question, option_a, option_b, option_c, option_d, correct_option)
+VALUES
+('neet', 'physics', 'What is the speed of light?', '3x10^8 m/s', '3x10^7 m/s', '1x10^8 m/s', '5x10^7 m/s', 'A'),
+('neet', 'chemistry', 'What is the atomic number of Helium?', '1', '2', '3', '4', 'B'),
+('jee', 'maths', 'Solve: 2x + 3 = 7', '1', '2', '3', '4', 'B');

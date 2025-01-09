@@ -1,0 +1,88 @@
+import mysql.connector
+import os
+import time
+
+# MySQL connection setup
+def connect_to_db():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="Sadiq@02",
+        database="ExamSystem"
+    )
+
+# Fetch questions from MySQL
+def fetch_questions(exam_type, subject):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, question, option_a, option_b, option_c, option_d, correct_option FROM questions WHERE exam_type=%s AND subject=%s",
+        (exam_type, subject)
+    )
+    questions = cursor.fetchall()
+    conn.close()
+    return questions
+
+# Exam logic
+def exam(exam_type, subject):
+    print(f"Starting {exam_type.upper()} exam for {subject.upper()}.")
+    questions = fetch_questions(exam_type, subject)
+    if not questions:
+        print("No questions available for the selected exam and subject.")
+        return
+
+    answers = {}
+    total_questions = len(questions)
+    question_idx = 0
+
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        q = questions[question_idx]
+        print(f"Question {question_idx + 1}/{total_questions}")
+        print(q[1])
+        print(f"A. {q[2]}\nB. {q[3]}\nC. {q[4]}\nD. {q[5]}")
+
+        if question_idx in answers:
+            print(f"Your previous answer: {answers[question_idx]}")
+
+        print("\nOptions: [A/B/C/D], [N: Next], [P: Previous], [S: Submit]")
+        choice = input("Your choice: ").strip().upper()
+
+        if choice in ['A', 'B', 'C', 'D']:
+            answers[question_idx] = choice
+        elif choice == 'N':
+            if question_idx < total_questions - 1:
+                question_idx += 1
+            else:
+                print("Already on the last question.")
+        elif choice == 'P':
+            if question_idx > 0:
+                question_idx -= 1
+            else:
+                print("Already on the first question.")
+        elif choice == 'S':
+            break
+        else:
+            print("Invalid choice. Try again.")
+        time.sleep(1)
+
+    score = evaluate_exam(answers, questions)
+    print(f"Exam completed. Your score: {score}/{total_questions}")
+
+# Evaluate the exam
+def evaluate_exam(answers, questions):
+    score = 0
+    for idx, user_answer in answers.items():
+        correct_answer = questions[idx][6]  # Correct option is at index 6
+        if user_answer == correct_answer:
+            score += 1
+    return score
+
+# Main execution
+if __name__ == "__main__":
+    exam_type = input("Enter exam type (neet/jee): ").strip().lower()
+    subject = input("Enter subject (physics/chemistry/maths): ").strip().lower()
+    exam(exam_type, subject)
+
+
+
